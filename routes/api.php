@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\PublicShopController;
 use App\Http\Controllers\Api\V1\ModelImageController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\Admin\CategoryController as AdminCategoryController;
 
 Route::prefix('v1')->group(function () {
 
@@ -43,5 +44,13 @@ Route::prefix('v1')->group(function () {
         Route::patch('/models/{model}/publish', [ModelController::class, 'publish']);
         Route::patch('/models/{model}/unpublish', [ModelController::class, 'unpublish']);
         Route::delete('/models/{model}',        [ModelController::class, 'destroy']);
+
+        // Admin SaaS (rôle admin uniquement)
+        Route::prefix('admin')->middleware('admin')->group(function () {
+            Route::get('/categories',              [AdminCategoryController::class, 'index']);
+            Route::post('/categories',             [AdminCategoryController::class, 'store']);
+            Route::put('/categories/{category}',   [AdminCategoryController::class, 'update']);
+            Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy']);
+        });
     });
 });
