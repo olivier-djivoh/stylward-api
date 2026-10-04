@@ -2,3 +2,7 @@
 !private/
 !public/
 !.gitignore
+# Fichiers locaux
+php
+php.cmd
+php.bat
