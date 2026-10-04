@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\ShopController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\PublicShopController;
 use App\Http\Controllers\Api\V1\ModelImageController;
+use App\Http\Controllers\Api\V1\CategoryController;
 
 Route::prefix('v1')->group(function () {
 
@@ -20,6 +21,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/public/shops/{slug}',           [PublicShopController::class, 'show']);
         Route::get('/public/shops/{slug}/models',    [PublicShopController::class, 'models']);
         Route::get('/public/shops/{slug}/models/{modelId}', [PublicShopController::class, 'model']);
+        Route::get('/categories', [CategoryController::class, 'index']);
     });
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me',      [AuthController::class, 'me']);
