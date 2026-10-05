@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\V1\PublicShopController;
 use App\Http\Controllers\Api\V1\ModelImageController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Api\V1\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Api\V1\Admin\ShopController as AdminShopController;
 
 Route::prefix('v1')->group(function () {
 
@@ -51,6 +53,18 @@ Route::prefix('v1')->group(function () {
             Route::post('/categories',             [AdminCategoryController::class, 'store']);
             Route::put('/categories/{category}',   [AdminCategoryController::class, 'update']);
             Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy']);
+
+            // Admin : Stylistes
+            Route::get('/stylists',                    [AdminUserController::class, 'index']);
+            Route::get('/stylists/{user}',             [AdminUserController::class, 'show']);
+            Route::patch('/stylists/{user}/suspend',   [AdminUserController::class, 'suspend']);
+            Route::patch('/stylists/{user}/activate',  [AdminUserController::class, 'activate']);
+
+            // Admin : Boutiques
+            Route::get('/shops',                       [AdminShopController::class, 'index']);
+            Route::get('/shops/{shop}',                [AdminShopController::class, 'show']);
+            Route::patch('/shops/{shop}/suspend',      [AdminShopController::class, 'suspend']);
+            Route::patch('/shops/{shop}/activate',     [AdminShopController::class, 'activate']);
         });
     });
 });
