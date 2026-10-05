@@ -8,6 +8,8 @@ use App\Models\Shop;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Http\Requests\Shop\UploadShopImageRequest;
+use Illuminate\Support\Facades\Storage;
 
 class ShopController extends Controller
 {
@@ -72,6 +74,57 @@ class ShopController extends Controller
     /**
      * Génère un slug unique. Ajoute -2, -3... si déjà pris.
      */
+
+    public function uploadLogo(UploadShopImageRequest $request): JsonResponse
+{
+    $shop = $request->user()->shop;
+
+    if (!$shop) {
+        return response()->json(['message' => 'Aucune boutique.'], 404);
+    }
+
+    // Supprime l'ancien logo s'il existe
+    if ($shop->logo_path) {
+        Storage::disk('public')->delete($shop->logo_path);
+    }
+
+    $file = $request->file('image');
+    $filename = Str::uuid() . '.' . strtolower($file->getClientOriginalExtension());
+    $path = $file->storeAs("shops/{$shop->id}/branding", $filename, 'public');
+
+    $shop->update(['logo_path' => $path]);
+
+    return response()->json([
+        'message'   => 'Logo mis à jour.',
+        'logo_path' => $path,
+        'url'       => Storage::disk('public')->url($path),
+    ]);
+}
+
+public function uploadCover(UploadShopImageRequest $request): JsonResponse
+{
+    $shop = $request->user()->shop;
+
+    if (!$shop) {
+        return response()->json(['message' => 'Aucune boutique.'], 404);
+    }
+
+    if ($shop->cover_path) {
+        Storage::disk('public')->delete($shop->cover_path);
+    }
+
+    $file = $request->file('image');
+    $filename = Str::uuid() . '.' . strtolower($file->getClientOriginalExtension());
+    $path = $file->storeAs("shops/{$shop->id}/branding", $filename, 'public');
+
+    $shop->update(['cover_path' => $path]);
+
+    return response()->json([
+        'message'    => 'Couverture mise à jour.',
+        'cover_path' => $path,
+        'url'        => Storage::disk('public')->url($path),
+    ]);
+}
     private function ensureUniqueSlug(string $slug, ?string $ignoreId = null): string
     {
         $base = $slug;

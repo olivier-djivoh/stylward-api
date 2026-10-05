@@ -66,5 +66,8 @@ Route::prefix('v1')->group(function () {
             Route::patch('/shops/{shop}/suspend',      [AdminShopController::class, 'suspend']);
             Route::patch('/shops/{shop}/activate',     [AdminShopController::class, 'activate']);
         });
+
+            Route::post('/shop/logo',  [ShopController::class, 'uploadLogo']);
+            Route::post('/shop/cover', [ShopController::class, 'uploadCover']);
     });
 });
