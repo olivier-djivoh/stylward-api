@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ModelResource;
 use App\Models\ClothingModel;
 use App\Models\Shop;
+use App\Models\ShopVisit;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class PublicShopController extends Controller
 {
@@ -59,4 +61,43 @@ class PublicShopController extends Controller
 
         return (new ModelResource($model))->response();
     }
+
+    /**
+     * Endpoint de tracking (appelé par le frontend).
+     */
+    public function track(Request $request, string $slug): JsonResponse
+{
+    $shop = Shop::where('slug', $slug)
+        ->where('status', 'active')
+        ->firstOrFail();
+
+    $data = $request->validate([
+        'event'    => ['required', 'in:view_shop,view_model,whatsapp_click'],
+        'model_id' => ['nullable', 'uuid', 'exists:models,id'],
+    ]);
+
+    // EMPREINTE UNIQUE = IP + User Agent
+    // → PC Chrome, PC Edge, Téléphone = 3 empreintes différentes
+    // → Même personne qui revient = 1 seule empreinte
+    $ip = $request->header('X-Forwarded-For')
+        ?? $request->ip()
+        ?? 'unknown';
+
+    $userAgent = (string) $request->userAgent();
+
+    $fingerprint = hash(
+        'sha256',
+        $ip . '|' . $userAgent . '|' . config('app.key')
+    );
+
+    ShopVisit::create([
+        'shop_id'    => $shop->id,
+        'model_id'   => $data['model_id'] ?? null,
+        'event'      => $data['event'],
+        'ip_hash'    => $fingerprint,
+        'user_agent' => substr($userAgent, 0, 255),
+    ]);
+
+    return response()->json(['ok' => true]);
+}
 }

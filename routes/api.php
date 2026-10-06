@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Api\V1\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\V1\Admin\ShopController as AdminShopController;
+use App\Http\Controllers\Api\V1\TrackController;
 
 Route::prefix('v1')->group(function () {
 
@@ -25,6 +26,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/public/shops/{slug}/models',    [PublicShopController::class, 'models']);
         Route::get('/public/shops/{slug}/models/{modelId}', [PublicShopController::class, 'model']);
         Route::get('/categories', [CategoryController::class, 'index']);
+        Route::post('/public/shops/{shop:slug}/track', [PublicShopController::class, 'track']);
     });
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me',      [AuthController::class, 'me']);
@@ -69,5 +71,7 @@ Route::prefix('v1')->group(function () {
 
             Route::post('/shop/logo',  [ShopController::class, 'uploadLogo']);
             Route::post('/shop/cover', [ShopController::class, 'uploadCover']);
+
+            Route::get('/shop/stats', [ShopController::class, 'stats']);
     });
 });
