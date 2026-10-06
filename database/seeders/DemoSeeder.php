@@ -20,7 +20,7 @@ class DemoSeeder extends Seeder
             [
                 'first_name'  => 'Olivier',
                 'last_name'   => 'Kouassi',
-                'email'       => 'olivier@demo.com',
+                'email'       => 'olivierdjivoh7@gmail.com',
                 'phone'       => '+229 97000001',
                 'shop_name'   => 'Atelier Olivier',
                 'shop_desc'   => 'Couture sur mesure pour hommes et femmes. Élégance et savoir-faire depuis 2010.',
@@ -38,7 +38,7 @@ class DemoSeeder extends Seeder
             [
                 'first_name'  => 'Kofi',
                 'last_name'   => 'Mensah',
-                'email'       => 'kofi@demo.com',
+                'email'       => 'jhoundjo97@gmail.com',
                 'phone'       => '+233 24000003',
                 'shop_name'   => 'Kofi Style',
                 'shop_desc'   => 'Costumes, chemises et accessoires pour gentlemen.',

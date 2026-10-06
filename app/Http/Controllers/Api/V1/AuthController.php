@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use App\Http\Requests\Auth\UpdatePasswordRequest;
 
 class AuthController extends Controller
 {
@@ -52,9 +53,14 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token', ['*'], now()->addDays(7))->plainTextToken;
 
+        $pendingDeletion = $user->isPendingDeletion();
+
         return response()->json([
-            'user'  => $user->only(['id', 'first_name', 'last_name', 'email', 'role']),
-            'token' => $token,
+            'user'                => $user->only(['id', 'first_name', 'last_name', 'email', 'role']),
+            'token'               => $token,
+            'pending_deletion'    => $pendingDeletion,
+            'deletion_due_at'     => $pendingDeletion ? $user->deletionDueAt()?->toIso8601String() : null,
+            'days_until_deletion' => $pendingDeletion ? $user->daysUntilDeletion() : null,
         ]);
     }
 
@@ -71,4 +77,47 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Déconnecté avec succès']);
     }
+
+    public function updatePassword(UpdatePasswordRequest $request): JsonResponse
+{
+    $user = $request->user();
+
+    if (!\Hash::check($request->current_password, $user->password)) {
+        throw ValidationException::withMessages([
+            'current_password' => ['Le mot de passe actuel est incorrect.'],
+        ]);
+    }
+
+    $user->update([
+        'password' => \Hash::make($request->password),
+    ]);
+
+    // Déconnecte tous les autres appareils par sécurité
+    $user->tokens()->where('id', '!=', $request->user()->currentAccessToken()->id)->delete();
+
+    return response()->json(['message' => 'Mot de passe mis à jour.']);
 }
+
+public function deleteAccount(Request $request): JsonResponse
+{
+    $user = $request->user();
+
+    $request->validate([
+        'password' => ['required', 'string'],
+    ]);
+
+    if (!\Hash::check($request->password, $user->password)) {
+        throw ValidationException::withMessages([
+            'password' => ['Mot de passe incorrect.'],
+        ]);
+    }
+
+    // Supprime tous les tokens et le compte (soft delete)
+    $user->tokens()->delete();
+    $user->delete();
+
+    return response()->json(['message' => 'Compte supprimé.']);
+}
+
+}
+

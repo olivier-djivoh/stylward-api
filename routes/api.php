@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\Admin\CategoryController as AdminCategoryControl
 use App\Http\Controllers\Api\V1\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\V1\Admin\ShopController as AdminShopController;
 use App\Http\Controllers\Api\V1\TrackController;
+use App\Http\Controllers\Api\V1\AccountDeletionController;
 
 Route::prefix('v1')->group(function () {
 
@@ -27,6 +28,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/public/shops/{slug}/models/{modelId}', [PublicShopController::class, 'model']);
         Route::get('/categories', [CategoryController::class, 'index']);
         Route::post('/public/shops/{shop:slug}/track', [PublicShopController::class, 'track']);
+        Route::post('/account/confirm-deletion/{token}', [AccountDeletionController::class, 'confirm']);
     });
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me',      [AuthController::class, 'me']);
@@ -34,6 +36,10 @@ Route::prefix('v1')->group(function () {
         Route::patch('/shop/activate', [ShopController::class, 'activate']);
         Route::post('/models/{model}/images', [ModelImageController::class, 'store']);
         Route::delete('/models/{model}/images/{image}', [ModelImageController::class, 'destroy']);
+        Route::put('/password', [AuthController::class, 'updatePassword']);
+        Route::delete('/account', [AuthController::class, 'deleteAccount']);
+        Route::post('/account/request-deletion', [AccountDeletionController::class, 'request']);
+        Route::post('/account/cancel-deletion',  [AccountDeletionController::class, 'cancel']);
 
         // Boutique
         Route::get('/shop',         [ShopController::class, 'show']);
@@ -48,6 +54,7 @@ Route::prefix('v1')->group(function () {
         Route::patch('/models/{model}/publish', [ModelController::class, 'publish']);
         Route::patch('/models/{model}/unpublish', [ModelController::class, 'unpublish']);
         Route::delete('/models/{model}',        [ModelController::class, 'destroy']);
+        Route::patch('/models/{model}/images/{image}/set-main', [ModelImageController::class, 'setMain']);
 
         // Admin SaaS (rôle admin uniquement)
         Route::prefix('admin')->middleware('admin')->group(function () {

@@ -51,7 +51,9 @@ class ClothingModel extends Model
     }
 
     public function images(): HasMany
-    {
-    return $this->hasMany(ModelImage::class, 'model_id')->orderBy('sort_order');
-    }
+{
+    return $this->hasMany(ModelImage::class, 'model_id')
+        ->orderByRaw("CASE WHEN type = 'main' THEN 0 ELSE 1 END")
+        ->orderBy('sort_order');
+}
 }

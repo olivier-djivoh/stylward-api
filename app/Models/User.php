@@ -22,6 +22,10 @@ class User extends Authenticatable
         'password',
         'role',
         'status',
+        'deletion_requested_at',
+        'deletion_token',
+        'deletion_reason',
+        'deletion_reason_detail',
     ];
 
     protected $attributes = [
@@ -37,6 +41,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'last_login_at'     => 'datetime',
+        'deletion_requested_at' => 'datetime',
         'password'          => 'hashed',
     ];
 
@@ -54,4 +59,20 @@ class User extends Authenticatable
     {
         return $this->role === 'stylist';
     }
+
+    public function isPendingDeletion(): bool
+{
+    return $this->deletion_requested_at !== null;
+}
+
+public function deletionDueAt(): ?\Carbon\Carbon
+{
+    return $this->deletion_requested_at?->copy()->addDays(30);
+}
+
+public function daysUntilDeletion(): ?int
+{
+    if (!$this->deletion_requested_at) return null;
+    return max(0, (int) now()->diffInDays($this->deletionDueAt(), false));
+}
 }

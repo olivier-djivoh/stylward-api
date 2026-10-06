@@ -9,6 +9,7 @@ use App\Models\ModelImage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class ModelImageController extends Controller
 {
@@ -65,4 +66,26 @@ class ModelImageController extends Controller
 
         return response()->json(null, 204);
     }
+    public function setMain(ClothingModel $model, ModelImage $image): JsonResponse
+{
+    $this->authorize('update', $model);
+
+    // Vérification critique : l'image appartient bien à ce modèle
+    if ($image->model_id !== $model->id) {
+        abort(404);
+    }
+
+    DB::transaction(function () use ($model, $image) {
+        // Retire le statut "main" de toutes les autres images
+        $model->images()
+            ->where('id', '!=', $image->id)
+            ->where('type', 'main')
+            ->update(['type' => 'gallery']);
+
+        // Celle-ci devient la principale
+        $image->update(['type' => 'main']);
+    });
+
+    return response()->json(['ok' => true]);
+}
 }
