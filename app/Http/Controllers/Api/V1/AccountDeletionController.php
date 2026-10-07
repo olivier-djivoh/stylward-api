@@ -61,9 +61,11 @@ class AccountDeletionController extends Controller
         }
 
         if ($user->isPendingDeletion()) {
+            // Si déjà en cours de suppression (même token), on renvoie succès
+            // car c'est probablement un double-clic ou un rechargement.
             return response()->json([
-                'message' => 'La suppression est déjà en cours.',
-            ], 409);
+                'message' => 'Votre compte sera supprimé définitivement dans 30 jours.',
+            ]);
         }
 
         DB::transaction(function () use ($user) {

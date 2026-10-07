@@ -9,6 +9,7 @@ use App\Models\Shop;
 use App\Models\ShopVisit;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Models\Notification;
 
 class PublicShopController extends Controller
 {
@@ -77,8 +78,6 @@ class PublicShopController extends Controller
     ]);
 
     // EMPREINTE UNIQUE = IP + User Agent
-    // → PC Chrome, PC Edge, Téléphone = 3 empreintes différentes
-    // → Même personne qui revient = 1 seule empreinte
     $ip = $request->header('X-Forwarded-For')
         ?? $request->ip()
         ?? 'unknown';
@@ -97,6 +96,34 @@ class PublicShopController extends Controller
         'ip_hash'    => $fingerprint,
         'user_agent' => substr($userAgent, 0, 255),
     ]);
+
+    // Notifications pour le styliste
+    if ($shop->user) {
+        if ($data['event'] === 'view_shop') {
+            // 1 seule notification par heure max (anti-spam)
+            $lastVisit = \App\Models\Notification::where('user_id', $shop->user->id)
+                ->where('type', 'new_visit')
+                ->where('created_at', '>=', now()->subHour())
+                ->exists();
+
+            if (!$lastVisit) {
+                \App\Models\Notification::notify(
+                    $shop->user,
+                    'new_visit',
+                    'Nouvelle visite sur votre boutique',
+                    'Quelqu\'un vient de découvrir vos créations.',
+                );
+            }
+        } elseif ($data['event'] === 'whatsapp_click') {
+            \App\Models\Notification::notify(
+                $shop->user,
+                'whatsapp_click',
+                'Nouveau contact WhatsApp',
+                'Un client souhaite commander une création.',
+                ['model_id' => $data['model_id'] ?? null],
+            );
+        }
+    }
 
     return response()->json(['ok' => true]);
 }

@@ -12,6 +12,8 @@ use App\Http\Controllers\Api\V1\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\V1\Admin\ShopController as AdminShopController;
 use App\Http\Controllers\Api\V1\TrackController;
 use App\Http\Controllers\Api\V1\AccountDeletionController;
+use App\Http\Controllers\Api\V1\Admin\ArchiveController;
+use App\Http\Controllers\Api\V1\NotificationController;
 
 Route::prefix('v1')->group(function () {
 
@@ -74,11 +76,22 @@ Route::prefix('v1')->group(function () {
             Route::get('/shops/{shop}',                [AdminShopController::class, 'show']);
             Route::patch('/shops/{shop}/suspend',      [AdminShopController::class, 'suspend']);
             Route::patch('/shops/{shop}/activate',     [AdminShopController::class, 'activate']);
+
+            Route::get('/archives',       [ArchiveController::class, 'index']);
+            Route::get('/archives/stats', [ArchiveController::class, 'stats']);
+            Route::delete('/archives', [ArchiveController::class, 'clear']);
         });
 
             Route::post('/shop/logo',  [ShopController::class, 'uploadLogo']);
             Route::post('/shop/cover', [ShopController::class, 'uploadCover']);
 
             Route::get('/shop/stats', [ShopController::class, 'stats']);
+
+            // Notifications
+            Route::get('/notifications',                    [NotificationController::class, 'index']);
+            Route::get('/notifications/unread-count',       [NotificationController::class, 'unreadCount']);
+            Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
+            Route::patch('/notifications/read-all',         [NotificationController::class, 'markAllAsRead']);
+            Route::delete('/notifications/{notification}',  [NotificationController::class, 'destroy']);
     });
 });

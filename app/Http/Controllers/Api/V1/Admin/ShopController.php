@@ -40,6 +40,15 @@ class ShopController extends Controller
     {
         $shop->update(['status' => 'suspended']);
 
+        if ($shop->user) {
+            \App\Models\Notification::notify(
+                $shop->user,
+                'shop_suspended',
+                'Votre boutique a été suspendue',
+                'Contactez le support pour plus d\'informations.',
+            );
+        }
+
         return response()->json([
             'message' => 'Boutique suspendue.',
             'shop'    => $shop->only(['id', 'name', 'slug', 'status']),
@@ -49,6 +58,16 @@ class ShopController extends Controller
     public function activate(Shop $shop): JsonResponse
     {
         $shop->update(['status' => 'active']);
+
+        // Notification
+        if ($shop->user) {
+            \App\Models\Notification::notify(
+                $shop->user,
+                'shop_activated',
+                'Votre boutique est activée',
+                'Elle est désormais visible publiquement.',
+            );
+        }
 
         return response()->json([
             'message' => 'Boutique activée.',

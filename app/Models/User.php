@@ -50,6 +50,18 @@ class User extends Authenticatable
         return $this->hasOne(Shop::class);
     }
 
+    protected static function booted(): void
+    {
+        static::deleting(function (User $user) {
+            // Empêche la suppression si une boutique existe (sauf si on force)
+            if (!$user->isForceDeleting() && $user->shop()->exists()) {
+                throw new \Exception(
+                    'Impossible de supprimer : une boutique est encore associée à ce compte.'
+                );
+            }
+        });
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';

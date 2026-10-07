@@ -92,6 +92,14 @@ class ModelController extends Controller
             'published_at' => now(),
         ]);
 
+        \App\Models\Notification::notify(
+            $model->shop->user,
+            'model_published',
+            'Création publiée',
+            "« {$model->name} » est maintenant visible dans votre boutique.",
+            ['model_id' => $model->id],
+        );
+
         return (new ModelResource($model))->response();
     }
 
