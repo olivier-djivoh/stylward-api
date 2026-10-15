@@ -1,4 +1,4 @@
-# SaaS Stylistes — API
+# Stylward — API
 
 Plateforme SaaS multi-tenant permettant à chaque styliste, tailleur ou créateur de mode de créer sa **boutique numérique**, gérer son **catalogue de modèles** et **partager un lien public** avec ses clients.
 
@@ -6,7 +6,8 @@ Plateforme SaaS multi-tenant permettant à chaque styliste, tailleur ou créateu
 
 ## 🎯 Fonctionnalités du MVP
 
-### Pour le styliste (authentifié)
+### Pour l'artisan de la mode (authentifié)
+
 - Inscription / Connexion via API (Sanctum)
 - Création de sa boutique avec **slug unique** auto-généré
 - Ajout / Modification / Suppression de modèles
@@ -15,12 +16,14 @@ Plateforme SaaS multi-tenant permettant à chaque styliste, tailleur ou créateu
 - Catégorisation des modèles (Vestes, Costumes, Robes, etc.)
 
 ### Pour le client (public, sans compte)
+
 - Consultation d'une boutique via son lien unique : `/api/v1/public/shops/{slug}`
 - Catalogue filtré : **uniquement** les modèles `published`
 - Détail d'un modèle avec images
 - Contact via WhatsApp (à venir côté frontend)
 
 ### Sécurité et isolation
+
 - **UUID** partout (aucun ID devinable)
 - **Isolation multi-tenant** stricte (Global Scope + Policies)
 - **UUID sur les tokens** Sanctum
@@ -32,20 +35,21 @@ Plateforme SaaS multi-tenant permettant à chaque styliste, tailleur ou créateu
 
 ## 🏗️ Stack technique
 
-| Couche | Technologie |
-|--------|-------------|
-| Framework | Laravel 12 |
-| PHP | 8.5 |
-| Base de données | PostgreSQL 18 |
-| Auth API | Laravel Sanctum |
-| Frontend | (à venir) React + Vite |
-| Environnement | Windows natif (Docker prévu) |
+| Couche          | Technologie                  |
+| --------------- | ---------------------------- |
+| Framework       | Laravel 12                   |
+| PHP             | 8.5                          |
+| Base de données | PostgreSQL 18                |
+| Auth API        | Laravel Sanctum              |
+| Frontend        | (à venir) React + Vite       |
+| Environnement   | Windows natif (Docker prévu) |
 
 ---
 
 ## 📦 Installation
 
 ### Prérequis
+
 - PHP 8.4+ avec extensions : `pdo_pgsql`, `mbstring`, `openssl`, `fileinfo`, `curl`, `zip`, `intl`, `gd`
 - Composer 2
 - PostgreSQL 16+
@@ -55,8 +59,8 @@ Plateforme SaaS multi-tenant permettant à chaque styliste, tailleur ou créateu
 
 ```bash
 # 1. Cloner le projet
-git clone <url-du-repo> saas-stylistes-api
-cd saas-stylistes-api
+git clone <url-du-repo> stylward-api
+cd stylward-api
 
 # 2. Installer les dépendances PHP
 composer install
@@ -85,3 +89,4 @@ php artisan migrate:fresh --seed
 
 # 8. Démarrer le serveur
 php artisan serve
+```

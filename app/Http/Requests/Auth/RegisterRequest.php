@@ -18,6 +18,8 @@ class RegisterRequest extends FormRequest
             'last_name'  => ['required', 'string', 'max:100'],
             'email' => ['required', 'email:rfc', 'max:191', 'unique:users,email'],
             'phone'      => ['nullable', 'string', 'max:30'],
+            'profession' => ['required', 'in:stylist,tailor,couturier,creator'],
+            'gender'     => ['required', 'in:neutral,male,female'],
             'password'   => [
                 'required',
                 'string',

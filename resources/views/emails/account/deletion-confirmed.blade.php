@@ -16,5 +16,5 @@ Me reconnecter
 </x-mail::button>
 
 À bientôt,<br>
-L'équipe SaaS Stylistes
+L'équipe Stylward
 </x-mail::message>

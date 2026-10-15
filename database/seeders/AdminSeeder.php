@@ -23,6 +23,6 @@ class AdminSeeder extends Seeder
             ]
         );
 
-        $this->command->info('✅ Compte admin créé : admin@saas-stylistes.com / AdminMotDePasse123!');
+        $this->command->info('✅ Compte admin créé : admin@Stylward.com / AdminMotDePasse123!');
     }
 }

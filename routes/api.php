@@ -14,12 +14,17 @@ use App\Http\Controllers\Api\V1\TrackController;
 use App\Http\Controllers\Api\V1\AccountDeletionController;
 use App\Http\Controllers\Api\V1\Admin\ArchiveController;
 use App\Http\Controllers\Api\V1\NotificationController;
+use App\Http\Controllers\Api\V1\CollectionController;
+use App\Http\Controllers\Api\V1\PasswordResetController;
 
 Route::prefix('v1')->group(function () {
 
     Route::middleware('throttle:5,1')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/login',    [AuthController::class, 'login']);
+
+        Route::post('/forgot-password', [PasswordResetController::class, 'sendLink']);
+        Route::post('/reset-password',  [PasswordResetController::class, 'reset']);
     });
 
 
@@ -31,10 +36,13 @@ Route::prefix('v1')->group(function () {
         Route::get('/categories', [CategoryController::class, 'index']);
         Route::post('/public/shops/{shop:slug}/track', [PublicShopController::class, 'track']);
         Route::post('/account/confirm-deletion/{token}', [AccountDeletionController::class, 'confirm']);
+        Route::get('/public/shops/{slug}/collections',                    [PublicShopController::class, 'collections']);
+        Route::get('/public/shops/{slug}/collections/{collectionSlug}',   [PublicShopController::class, 'collection']);
     });
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me',      [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
+        Route::get('/shop/catalogue-pdf', [ShopController::class, 'exportCatalogue']);
         Route::patch('/shop/activate', [ShopController::class, 'activate']);
         Route::post('/models/{model}/images', [ModelImageController::class, 'store']);
         Route::delete('/models/{model}/images/{image}', [ModelImageController::class, 'destroy']);
@@ -58,6 +66,18 @@ Route::prefix('v1')->group(function () {
         Route::delete('/models/{model}',        [ModelController::class, 'destroy']);
         Route::patch('/models/{model}/images/{image}/set-main', [ModelImageController::class, 'setMain']);
 
+        // Collections (styliste)
+        Route::get('/collections',                          [CollectionController::class, 'index']);
+        Route::post('/collections',                         [CollectionController::class, 'store']);
+        Route::get('/collections/{collection}',             [CollectionController::class, 'show']);
+        Route::put('/collections/{collection}',             [CollectionController::class, 'update']);
+        Route::delete('/collections/{collection}',          [CollectionController::class, 'destroy']);
+        Route::patch('/collections/{collection}/publish',   [CollectionController::class, 'publish']);
+        Route::patch('/collections/{collection}/unpublish', [CollectionController::class, 'unpublish']);
+        Route::post('/collections/{collection}/models',     [CollectionController::class, 'addModel']);
+        Route::delete('/collections/{collection}/models/{modelId}', [CollectionController::class, 'removeModel']);
+        Route::post('/collections/{collection}/cover',      [CollectionController::class, 'uploadCover']);
+
         // Admin SaaS (rôle admin uniquement)
         Route::prefix('admin')->middleware('admin')->group(function () {
             Route::get('/categories',              [AdminCategoryController::class, 'index']);
@@ -76,7 +96,6 @@ Route::prefix('v1')->group(function () {
             Route::get('/shops/{shop}',                [AdminShopController::class, 'show']);
             Route::patch('/shops/{shop}/suspend',      [AdminShopController::class, 'suspend']);
             Route::patch('/shops/{shop}/activate',     [AdminShopController::class, 'activate']);
-
             Route::get('/archives',       [ArchiveController::class, 'index']);
             Route::get('/archives/stats', [ArchiveController::class, 'stats']);
             Route::delete('/archives', [ArchiveController::class, 'clear']);
@@ -86,6 +105,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/shop/cover', [ShopController::class, 'uploadCover']);
 
             Route::get('/shop/stats', [ShopController::class, 'stats']);
+
 
             // Notifications
             Route::get('/notifications',                    [NotificationController::class, 'index']);

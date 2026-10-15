@@ -56,7 +56,7 @@ class AuthController extends Controller
         $pendingDeletion = $user->isPendingDeletion();
 
         return response()->json([
-            'user'                => $user->only(['id', 'first_name', 'last_name', 'email', 'role']),
+            'user'  => $user->only(['id', 'first_name', 'last_name', 'email', 'role', 'profession', 'gender']),
             'token'               => $token,
             'pending_deletion'    => $pendingDeletion,
             'deletion_due_at'     => $pendingDeletion ? $user->deletionDueAt()?->toIso8601String() : null,
@@ -67,7 +67,7 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         return response()->json($request->user()->only([
-            'id', 'first_name', 'last_name', 'email', 'phone', 'role', 'status',
+            'id', 'first_name', 'last_name', 'email', 'phone', 'role', 'profession', 'gender', 'status',
         ]));
     }
 

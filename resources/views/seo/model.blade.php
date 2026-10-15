@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>{{ $title }}</title>
+    <link rel="canonical" href="{{ $canonicalUrl }}">
+
+    {{-- Open Graph --}}
+    <meta property="og:type" content="product">
+    <meta property="og:site_name" content="Stylward">
+    <meta property="og:url" content="{{ $canonicalUrl }}">
+    <meta property="og:title" content="{{ $title }}">
+    <meta property="og:description" content="{{ $description }}">
+    <meta property="og:image" content="{{ $image }}">
+
+    <meta property="og:locale" content="fr_FR">
+
+    {{-- Twitter Card --}}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $title }}">
+    <meta name="twitter:description" content="{{ $description }}">
+    <meta name="twitter:image" content="{{ $image }}">
+
+    {{-- Redirection --}}
+    <meta http-equiv="refresh" content="0; url={{ $canonicalUrl }}">
+</head>
+<body>
+    <p>Redirection vers <a href="{{ $canonicalUrl }}">{{ $model->name }}</a>…</p>
+</body>
+</html>

@@ -11,9 +11,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'SaaS Stylistes',
+        name: 'Stylward',
         short_name: 'Stylistes',
-        description: 'Découvrez les créations de vos stylistes préférés.',
+        description: 'Découvrez les créations de vos artisans de la mode  préférés.',
         theme_color: '#171717',
         background_color: '#FCFBF8',
         display: 'standalone',

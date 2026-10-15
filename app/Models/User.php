@@ -21,6 +21,7 @@ class User extends Authenticatable
         'phone',
         'password',
         'role',
+        'profession',
         'status',
         'deletion_requested_at',
         'deletion_token',
@@ -86,5 +87,17 @@ public function daysUntilDeletion(): ?int
 {
     if (!$this->deletion_requested_at) return null;
     return max(0, (int) now()->diffInDays($this->deletionDueAt(), false));
+}
+
+public function professionLabel(): string
+{
+    $map = [
+        'stylist'   => ['neutral' => 'Styliste',  'male' => 'Styliste',  'female' => 'Styliste'],
+        'tailor'    => ['neutral' => 'Tailleur',  'male' => 'Tailleur',  'female' => 'Tailleuse'],
+        'couturier' => ['neutral' => 'Couturier', 'male' => 'Couturier', 'female' => 'Couturière'],
+        'creator'   => ['neutral' => 'Créateur',  'male' => 'Créateur',  'female' => 'Créatrice'],
+    ];
+
+    return $map[$this->profession][$this->gender] ?? 'Artisan';
 }
 }

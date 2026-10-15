@@ -28,3 +28,33 @@ Thumbs.db
 .env.orig
 .env.local
 .env.*.local
+
+
+# Fichiers de debug / personnel
+backend_structure.txt
+projet_dump.txt
+structure.txt
+frontend_structure.txt
+frontend_dump.txt
+projet_dump.txt
+
+# Scripts Windows perso
+composer.cmd
+php.cmd
+*.cmd
+
+# Fichiers créés par erreur (noms bizarres)
+cascadeOnDelete()
+constrained('collections')
+constrained('models')
+default(0)
+foreignUuid('collection_id')
+foreignUuid('model_id')
+index(['collection_id'
+primary()
+unique(['collection_id'
+useCurrent()
+
+# Fichiers parasites - motif large
+index(*collection_id*
+unique(*collection_id*

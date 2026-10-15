@@ -49,7 +49,7 @@ class UserController extends Controller
         $user->update(['status' => 'suspended']);
 
         return response()->json([
-            'message' => 'Compte styliste suspendu.',
+            'message' => 'Compte artisan de la mode suspendu.',
             'user'    => $user->only(['id', 'first_name', 'last_name', 'email', 'status']),
         ]);
     }
@@ -63,7 +63,7 @@ class UserController extends Controller
         $user->update(['status' => 'active']);
 
         return response()->json([
-            'message' => 'Compte styliste réactivé.',
+            'message' => 'Compte artisan de la mode réactivé.',
             'user'    => $user->only(['id', 'first_name', 'last_name', 'email', 'status']),
         ]);
     }

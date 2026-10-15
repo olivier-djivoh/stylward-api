@@ -14,19 +14,54 @@ use Illuminate\Support\Str;
 class ModelController extends Controller
 {
     public function index(Request $request): JsonResponse
-    {
-        $user = $request->user();
+{
+    $user = $request->user();
 
-        // Le Global Scope filtre automatiquement par shop du user
-        $models = ClothingModel::query()
-            ->with(['category', 'images'])
-            ->when($request->status, fn ($q) => $q->where('status', $request->status))
-            ->when($request->category_id, fn ($q) => $q->where('category_id', $request->category_id))
-            ->orderByDesc('created_at')
-            ->paginate(20);
+    $sort = $request->query('sort', 'recent');
 
-        return ModelResource::collection($models)->response();
+    // Le Global Scope filtre automatiquement par shop du user
+    $query = ClothingModel::query()
+        ->with(['category', 'images'])
+        ->when($request->status, fn ($q) => $q->where('status', $request->status))
+        ->when($request->category_id, fn ($q) => $q->where('category_id', $request->category_id));
+
+    switch ($sort) {
+        case 'oldest':
+            $query->orderBy('created_at', 'asc');
+            break;
+
+        case 'name_asc':
+            $query->orderBy('name', 'asc');
+            break;
+
+        case 'name_desc':
+            $query->orderBy('name', 'desc');
+            break;
+
+        case 'price_asc':
+            $query->orderBy('price', 'asc');
+            break;
+
+        case 'price_desc':
+            $query->orderBy('price', 'desc');
+            break;
+
+        case 'category':
+            $query->leftJoin('categories', 'categories.id', '=', 'clothing_models.category_id')
+                  ->orderBy('categories.name', 'asc')
+                  ->select('clothing_models.*');
+            break;
+
+        case 'recent':
+        default:
+            $query->orderByDesc('created_at');
+            break;
     }
+
+    $models = $query->paginate(20);
+
+    return ModelResource::collection($models)->response();
+}
 
     public function show(ClothingModel $model): JsonResponse
     {

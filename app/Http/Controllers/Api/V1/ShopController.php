@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ShopController extends Controller
 {
@@ -271,4 +272,32 @@ class ShopController extends Controller
 
         return $slug;
     }
+
+    public function exportCatalogue(Request $request)
+{
+    $shop = $request->user()->shop;
+
+    if (!$shop) {
+        return response()->json(['message' => 'Aucune boutique.'], 404);
+    }
+
+    $models = \App\Models\ClothingModel::where('shop_id', $shop->id)
+        ->where('status', 'published')
+        ->with(['category', 'images'])
+        ->orderBy('created_at')
+        ->get();
+
+    $pdf = Pdf::loadView('pdf.catalogue', [
+        'shop'   => $shop,
+        'models' => $models,
+    ]);
+
+    $pdf->setPaper('a4', 'portrait');
+    $pdf->setOption('isRemoteEnabled', true);
+    $pdf->setOption('isHtml5ParserEnabled', true);
+
+    $filename = 'catalogue-' . $shop->slug . '.pdf';
+
+    return $pdf->download($filename);
+}
 }

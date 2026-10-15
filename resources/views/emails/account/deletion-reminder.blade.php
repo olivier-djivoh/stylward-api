@@ -15,5 +15,5 @@ Me reconnecter
 
 Après cette date, la suppression sera **définitive et irréversible**.
 
-L'équipe SaaS Stylistes
+L'équipe Stylward
 </x-mail::message>

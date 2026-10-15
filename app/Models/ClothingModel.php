@@ -56,4 +56,14 @@ class ClothingModel extends Model
         ->orderByRaw("CASE WHEN type = 'main' THEN 0 ELSE 1 END")
         ->orderBy('sort_order');
 }
+
+public function collections(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+{
+    return $this->belongsToMany(
+        Collection::class,
+        'collection_model',
+        'model_id',
+        'collection_id'
+    )->withPivot('sort_order');
+}
 }
