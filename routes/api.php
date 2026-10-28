@@ -23,9 +23,17 @@ use Illuminate\Support\Facades\Artisan;
 Route::prefix('v1')->group(function () {
 
     Route::get('/run-seeder', function () {
+    try {
         Artisan::call('db:seed', ['--force' => true]);
-        return 'Le seeder a été exécuté avec succès !';
-    });
+        return response()->json(['message' => '✅ Seeder exécuté avec succès !']);
+    } catch (\Exception $e) {
+        return response()->json([
+            'erreur' => $e->getMessage(),
+            'fichier' => $e->getFile(),
+            'ligne' => $e->getLine()
+        ], 500);
+    }
+});
 
     Route::middleware('throttle:5,1')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
