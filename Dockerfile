@@ -1,20 +1,12 @@
-FROM richarvey/nginx-php-fpm:php8.3.0
+FROM serversideup/php:8.3-fpm-nginx
 
-COPY . .
+# Active les automatisations Laravel (migrations, cache config, etc.)
+ENV AUTORUN_ENABLED=true
+ENV AUTORUN_LARAVEL_MIGRATION=true
+ENV AUTORUN_LARAVEL_CONFIG_CACHE=true
 
-# Configuration de l'image
-ENV SKIP_COMPOSER 1
-ENV WEBROOT /var/www/html/public
-ENV PHP_ERRORS_STDERR 1
-ENV RUN_SCRIPTS 1
-ENV REAL_IP_HEADER 1
+# Copie du code (l'image se charge du reste)
+COPY . /var/www/html
 
-# Configuration de Laravel
-ENV APP_ENV production
-ENV APP_DEBUG false
-ENV LOG_CHANNEL stderr
-
-# Permet à Composer de s'exécuter en tant que root
-ENV COMPOSER_ALLOW_SUPERUSER 1
-
-CMD ["/start.sh"]
+# (Optionnel) Si tu veux garder ton script de déploiement
+# COPY scripts/ /etc/entrypoint.d/
