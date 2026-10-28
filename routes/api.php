@@ -16,25 +16,11 @@ use App\Http\Controllers\Api\V1\Admin\ArchiveController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\CollectionController;
 use App\Http\Controllers\Api\V1\PasswordResetController;
-use Illuminate\Support\Facades\Artisan;
 
 
 
 Route::prefix('v1')->group(function () {
 
-    Route::get('/run-seeder', function () {
-        try {
-            // 1. On supprime tout et on recrée les tables
-            Artisan::call('migrate:fresh', ['--force' => true]);
-            
-            // 2. On injecte les données de démo
-            Artisan::call('db:seed', ['--force' => true]);
-            
-            return response()->json(['message' => '✅ Base de données réinitialisée et seeder exécuté avec succès !']);
-        } catch (\Exception $e) {
-            return response()->json(['erreur' => $e->getMessage()], 500);
-        }
-    });
     Route::middleware('throttle:5,1')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/login',    [AuthController::class, 'login']);
