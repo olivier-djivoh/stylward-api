@@ -18,12 +18,14 @@ use App\Http\Controllers\Api\V1\CollectionController;
 use App\Http\Controllers\Api\V1\PasswordResetController;
 use Illuminate\Support\Facades\Artisan;
 
-Route::get('/run-seeder', function () {
-    Artisan::call('db:seed', ['--force' => true]);
-    return 'Le seeder a été exécuté avec succès !';
-});
+
 
 Route::prefix('v1')->group(function () {
+
+   Route::get('/run-seeder', function () {
+        Artisan::call('db:seed', ['--force' => true]);
+        return 'Le seeder a été exécuté avec succès !';
+   });
 
     Route::middleware('throttle:5,1')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
