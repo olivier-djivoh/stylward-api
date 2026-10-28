@@ -18,3 +18,5 @@ ENV AUTORUN_LARAVEL_MIGRATION=true
 ENV AUTORUN_LARAVEL_CONFIG_CACHE=true
 
 RUN php artisan config:clear
+
+RUN php -m | grep pdo_pgsql
