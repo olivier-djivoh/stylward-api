@@ -20,3 +20,5 @@ ENV AUTORUN_LARAVEL_CONFIG_CACHE=true
 RUN php artisan config:clear
 
 RUN php -m | grep pdo_pgsql
+
+COPY docker/default.conf /etc/nginx/conf.d/default.conf
