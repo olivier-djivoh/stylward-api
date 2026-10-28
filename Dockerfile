@@ -1,12 +1,18 @@
 FROM serversideup/php:8.3-fpm-nginx
 
-# Active les automatisations Laravel (migrations, cache config, etc.)
+# On passe en root pour pouvoir installer les dépendances
+USER root
+
+# On copie le code et on donne les droits au serveur web
+COPY --chown=www-data:www-data . /var/www/html
+
+# On installe les dépendances Composer dans l'image
+RUN composer install --no-dev --optimize-autoloader
+
+# On remet l'utilisateur par défaut (www-data) pour la sécurité
+USER www-data
+
+# Configuration des automatisations Laravel
 ENV AUTORUN_ENABLED=true
 ENV AUTORUN_LARAVEL_MIGRATION=true
 ENV AUTORUN_LARAVEL_CONFIG_CACHE=true
-
-# Copie du code (l'image se charge du reste)
-COPY . /var/www/html
-
-# (Optionnel) Si tu veux garder ton script de déploiement
-# COPY scripts/ /etc/entrypoint.d/
