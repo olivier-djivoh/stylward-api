@@ -16,6 +16,12 @@ use App\Http\Controllers\Api\V1\Admin\ArchiveController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\CollectionController;
 use App\Http\Controllers\Api\V1\PasswordResetController;
+use Illuminate\Support\Facades\Artisan;
+
+Route::get('/run-seeder', function () {
+    Artisan::call('db:seed', ['--force' => true]);
+    return 'Le seeder a été exécuté avec succès !';
+});
 
 Route::prefix('v1')->group(function () {
 
@@ -79,7 +85,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/collections/{collection}/models',     [CollectionController::class, 'addModel']);
         Route::delete('/collections/{collection}/models/{modelId}', [CollectionController::class, 'removeModel']);
         Route::post('/collections/{collection}/cover',      [CollectionController::class, 'uploadCover']);
-    
+
 
         // Admin SaaS (rôle admin uniquement)
         Route::prefix('admin')->middleware('admin')->group(function () {
