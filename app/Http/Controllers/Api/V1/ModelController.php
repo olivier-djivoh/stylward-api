@@ -103,6 +103,30 @@ class ModelController extends Controller
         return (new ModelResource($model->load(['category', 'images'])))->response()->setStatusCode(201);
     }
 
+    public function duplicate(ClothingModel $model): JsonResponse
+{
+    $this->authorize('update', $model);
+
+    // On duplique le modèle
+    $newModel = $model->replicate();
+    
+    // On modifie les champs spécifiques
+    // 1. On enlève tous les " (Copie)" déjà présents à la fin du nom
+$baseName = preg_replace('/\s*\(Copie\)(\s*\(Copie\))*$/i', '', $model->name);
+
+// 2. On ajoute un seul " (Copie)"
+    $newModel->name = $baseName . ' (Copie)';
+
+    // 3. On génère le slug
+    $newModel->slug = $this->ensureUniqueSlug($model->shop_id, Str::slug($newModel->name));
+    $newModel->status = 'draft';
+    $newModel->published_at = null;
+    $newModel->save();
+
+    // On retourne le nouveau modèle
+    return (new ModelResource($newModel->load(['category', 'images'])))->response()->setStatusCode(201);
+}
+
     public function update(UpdateModelRequest $request, ClothingModel $model): JsonResponse
     {
         $this->authorize('update', $model);

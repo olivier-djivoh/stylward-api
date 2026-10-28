@@ -58,3 +58,13 @@ useCurrent()
 # Fichiers parasites - motif large
 index(*collection_id*
 unique(*collection_id*
+
+
+# ═══ Fichiers retirés du suivi Git ═══
+docker-compose.yml
+.env.docker
+.env.example
+composer.lock
+composer.json
+AGENTS.md
+CLAUDE.md

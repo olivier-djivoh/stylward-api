@@ -47,6 +47,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/models/{model}/images', [ModelImageController::class, 'store']);
         Route::delete('/models/{model}/images/{image}', [ModelImageController::class, 'destroy']);
         Route::put('/password', [AuthController::class, 'updatePassword']);
+        Route::put('/profile', [AuthController::class, 'updateProfile']);
         Route::delete('/account', [AuthController::class, 'deleteAccount']);
         Route::post('/account/request-deletion', [AccountDeletionController::class, 'request']);
         Route::post('/account/cancel-deletion',  [AccountDeletionController::class, 'cancel']);
@@ -62,6 +63,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/models/{model}',           [ModelController::class, 'show']);
         Route::put('/models/{model}',           [ModelController::class, 'update']);
         Route::patch('/models/{model}/publish', [ModelController::class, 'publish']);
+        Route::post('/models/{model}/duplicate', [ModelController::class, 'duplicate']);
         Route::patch('/models/{model}/unpublish', [ModelController::class, 'unpublish']);
         Route::delete('/models/{model}',        [ModelController::class, 'destroy']);
         Route::patch('/models/{model}/images/{image}/set-main', [ModelImageController::class, 'setMain']);
@@ -77,6 +79,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/collections/{collection}/models',     [CollectionController::class, 'addModel']);
         Route::delete('/collections/{collection}/models/{modelId}', [CollectionController::class, 'removeModel']);
         Route::post('/collections/{collection}/cover',      [CollectionController::class, 'uploadCover']);
+    
 
         // Admin SaaS (rôle admin uniquement)
         Route::prefix('admin')->middleware('admin')->group(function () {

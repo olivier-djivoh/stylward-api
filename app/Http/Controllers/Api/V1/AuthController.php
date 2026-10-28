@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\Auth\UpdatePasswordRequest;
+use App\Http\Requests\Auth\UpdateProfileRequest;
 
 class AuthController extends Controller
 {
@@ -77,6 +78,25 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Déconnecté avec succès']);
     }
+
+    public function updateProfile(UpdateProfileRequest $request): JsonResponse
+{
+    $user = $request->user();
+
+    $user->update([
+        'first_name' => $request->first_name,
+        'last_name'  => $request->last_name,
+        'email'      => $request->email,
+        'phone'      => $request->phone,
+    ]);
+
+    return response()->json([
+        'message' => 'Profil mis à jour.',
+        'user'    => $user->only([
+            'id', 'first_name', 'last_name', 'email', 'phone', 'role', 'status',
+        ]),
+    ]);
+}
 
     public function updatePassword(UpdatePasswordRequest $request): JsonResponse
 {
