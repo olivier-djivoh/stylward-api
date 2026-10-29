@@ -22,8 +22,8 @@ class SeoController extends Controller
             ?: 'Découvrez les créations de ' . $shop->name;
 
         $image = $shop->cover_path
-            ? asset('storage/' . $shop->cover_path)
-            : asset('images/og-default.jpg');
+            ? 'https://stylward-api.onrender.com/storage/' . $shop->cover_path
+            : 'https://stylward-api.onrender.com/images/og-default.jpg';
 
         $canonicalUrl = config('app.frontend_url') . '/shops/' . $shop->slug;
 
