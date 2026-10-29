@@ -8,9 +8,6 @@ use Illuminate\Http\Request;
 
 class SeoController extends Controller
 {
-    /**
-     * Aperçu Open Graph pour une boutique.
-     */
     public function shop(string $slug)
     {
         $shop = Shop::where('slug', $slug)
@@ -18,27 +15,18 @@ class SeoController extends Controller
             ->firstOrFail();
 
         $title = $shop->name . ' — Boutique en ligne';
-        $description = $shop->description
-            ?: 'Découvrez les créations de ' . $shop->name;
+        $description = $shop->description ?: 'Découvrez les créations de ' . $shop->name;
 
+        // 👇 Utilisation de asset() pour la cohérence
         $image = $shop->cover_path
-            ? 'https://stylward-api.onrender.com/storage/' . $shop->cover_path
-            : 'https://stylward-api.onrender.com/images/og-default.jpg';
+            ? asset('storage/' . $shop->cover_path)
+            : asset('images/og-default.jpg');
 
         $canonicalUrl = config('app.frontend_url') . '/shops/' . $shop->slug;
 
-        return view('seo.shop', compact(
-            'shop',
-            'title',
-            'description',
-            'image',
-            'canonicalUrl'
-        ));
+        return view('seo.shop', compact('shop', 'title', 'description', 'image', 'canonicalUrl'));
     }
 
-    /**
-     * Aperçu Open Graph pour un modèle.
-     */
     public function model(string $slug, string $modelId)
     {
         $shop = Shop::where('slug', $slug)
@@ -51,28 +39,19 @@ class SeoController extends Controller
             ->with('images')
             ->firstOrFail();
 
-        $mainImage = $model->images->firstWhere('type', 'main')
-            ?? $model->images->first();
+        $mainImage = $model->images->firstWhere('type', 'main') ?? $model->images->first();
 
         $image = $mainImage
             ? asset('storage/' . $mainImage->path)
             : asset('images/og-default.jpg');
 
         $title = $model->name . ' — ' . $shop->name;
-        $description = $model->description
-            ?: 'Découvrez ' . $model->name . ' chez ' . $shop->name;
+        $description = $model->description ?: 'Découvrez ' . $model->name . ' chez ' . $shop->name;
 
         $canonicalUrl = config('app.frontend_url')
             . '/shops/' . $shop->slug
             . '/models/' . $model->id;
 
-        return view('seo.model', compact(
-            'shop',
-            'model',
-            'title',
-            'description',
-            'image',
-            'canonicalUrl'
-        ));
+        return view('seo.model', compact('shop', 'model', 'title', 'description', 'image', 'canonicalUrl'));
     }
 }
