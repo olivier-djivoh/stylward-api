@@ -10,47 +10,49 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Intervention\Image\Laravel\Facades\Image;
 
 class ModelImageController extends Controller
 {
     public function store(UploadImageRequest $request, ClothingModel $model): JsonResponse
-    {
-        $this->authorize('update', $model);
+{
+    $this->authorize('update', $model);
 
-        $type = $request->input('type', 'gallery');
+    $type = $request->input('type', 'gallery');
 
-        // Une seule image principale par modèle
-        if ($type === 'main') {
-            $model->images()->where('type', 'main')->delete();
-        }
-
-        $file = $request->file('image');
-
-        // Nom de fichier aléatoire : impossible à deviner, impossible d'écraser
-        $extension = $file->getClientOriginalExtension();
-        $filename  = Str::uuid() . '.' . strtolower($extension);
-        $folder    = "models/{$model->shop_id}/{$model->id}";
-
-        // Stockage sur le disque public
-        $path = $file->storeAs($folder, $filename, 'public');
-
-        $image = ModelImage::create([
-            'model_id'   => $model->id,
-            'path'       => $path,
-            'type'       => $type,
-            'sort_order' => $model->images()->max('sort_order') + 1,
-            'size_bytes' => $file->getSize(),
-            'mime_type'  => $file->getMimeType(),
-        ]);
-
-        return response()->json([
-            'id'         => $image->id,
-            'path'       => $path,
-            'url'        => Storage::disk('public')->url($path),
-            'type'       => $image->type,
-            'sort_order' => $image->sort_order,
-        ], 201);
+    if ($type === 'main') {
+        $model->images()->where('type', 'main')->delete();
     }
+
+    $file = $request->file('image');
+    $filename = \Illuminate\Support\Str::uuid() . '.jpg';
+    $folder = "models/{$model->shop_id}/{$model->id}";
+    $path = "{$folder}/{$filename}";
+
+    // On garde une bonne qualité pour les modèles (1000px max) mais on compresse
+    $image = Image::read($file)
+        ->scaleDown(width: 1000) // Garde le ratio, réduit si > 1000px
+        ->toJpeg(85);
+
+    \Illuminate\Support\Facades\Storage::disk('public')->put($path, (string) $image);
+
+    $imageModel = ModelImage::create([
+        'model_id'   => $model->id,
+        'path'       => $path,
+        'type'       => $type,
+        'sort_order' => $model->images()->max('sort_order') + 1,
+        'size_bytes' => \Illuminate\Support\Facades\Storage::disk('public')->size($path),
+        'mime_type'  => 'image/jpeg',
+    ]);
+
+    return response()->json([
+        'id'         => $imageModel->id,
+        'path'       => $path,
+        'url'        => \Illuminate\Support\Facades\Storage::url($path),
+        'type'       => $imageModel->type,
+        'sort_order' => $imageModel->sort_order,
+    ], 201);
+}
 
     public function destroy(ClothingModel $model, ModelImage $image): JsonResponse
     {

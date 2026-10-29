@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Intervention\Image\Laravel\Facades\Image;
 
 class ShopController extends Controller
 {
@@ -86,54 +87,68 @@ class ShopController extends Controller
     }
 
     public function uploadLogo(UploadShopImageRequest $request): JsonResponse
-    {
-        $shop = $request->user()->shop;
-
-        if (!$shop) {
-            return response()->json(['message' => 'Aucune boutique.'], 404);
-        }
-
-        if ($shop->logo_path) {
-            Storage::disk('public')->delete($shop->logo_path);
-        }
-
-        $file = $request->file('image');
-        $filename = Str::uuid() . '.' . strtolower($file->getClientOriginalExtension());
-        $path = $file->storeAs("shops/{$shop->id}/branding", $filename, 'public');
-
-        $shop->update(['logo_path' => $path]);
-
-        return response()->json([
-            'message'   => 'Logo mis à jour.',
-            'logo_path' => $path,
-            'url'       => Storage::disk('public')->url($path),
-        ]);
+{
+    $shop = $request->user()->shop;
+    if (!$shop) {
+        return response()->json(['message' => 'Aucune boutique.'], 404);
     }
+
+    if ($shop->logo_path) {
+        \Illuminate\Support\Facades\Storage::disk('public')->delete($shop->logo_path);
+    }
+
+    $file = $request->file('image');
+    
+    // On génère un nom en .jpg
+    $filename = \Illuminate\Support\Str::uuid() . '.jpg';
+    $path = "shops/{$shop->id}/branding/{$filename}";
+
+    // On redimensionne à 400x400 (carré) et on compresse en JPG
+    $image = Image::read($file)
+        ->cover(400, 400)
+        ->toJpeg(80);
+
+    \Illuminate\Support\Facades\Storage::disk('public')->put($path, (string) $image);
+
+    $shop->update(['logo_path' => $path]);
+
+    return response()->json([
+        'message'   => 'Logo mis à jour.',
+        'logo_path' => $path,
+        'url'       => \Illuminate\Support\Facades\Storage::url($path),
+    ]);
+}
 
     public function uploadCover(UploadShopImageRequest $request): JsonResponse
-    {
-        $shop = $request->user()->shop;
-
-        if (!$shop) {
-            return response()->json(['message' => 'Aucune boutique.'], 404);
-        }
-
-        if ($shop->cover_path) {
-            Storage::disk('public')->delete($shop->cover_path);
-        }
-
-        $file = $request->file('image');
-        $filename = Str::uuid() . '.' . strtolower($file->getClientOriginalExtension());
-        $path = $file->storeAs("shops/{$shop->id}/branding", $filename, 'public');
-
-        $shop->update(['cover_path' => $path]);
-
-        return response()->json([
-            'message'    => 'Couverture mise à jour.',
-            'cover_path' => $path,
-            'url'        => Storage::disk('public')->url($path),
-        ]);
+{
+    $shop = $request->user()->shop;
+    if (!$shop) {
+        return response()->json(['message' => 'Aucune boutique.'], 404);
     }
+
+    if ($shop->cover_path) {
+        \Illuminate\Support\Facades\Storage::disk('public')->delete($shop->cover_path);
+    }
+
+    $file = $request->file('image');
+    $filename = \Illuminate\Support\Str::uuid() . '.jpg';
+    $path = "shops/{$shop->id}/branding/{$filename}";
+
+    // On redimensionne au format parfait pour les réseaux sociaux (1200x630) et on compresse
+    $image = Image::read($file)
+        ->cover(1200, 630)
+        ->toJpeg(80);
+
+    \Illuminate\Support\Facades\Storage::disk('public')->put($path, (string) $image);
+
+    $shop->update(['cover_path' => $path]);
+
+    return response()->json([
+        'message'    => 'Couverture mise à jour.',
+        'cover_path' => $path,
+        'url'        => \Illuminate\Support\Facades\Storage::url($path),
+    ]);
+}
 
     public function stats(Request $request): JsonResponse
 {
