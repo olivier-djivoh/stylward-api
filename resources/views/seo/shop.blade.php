@@ -11,6 +11,8 @@
     <meta property="og:title" content="{{ $title }}">
     <meta property="og:description" content="{{ $description }}">
     <meta property="og:image" content="{{ $image }}">
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
     <meta property="og:locale" content="fr_FR">
 
@@ -19,7 +21,9 @@
     <meta name="twitter:description" content="{{ $description }}">
     <meta name="twitter:image" content="{{ $image }}">
 
-    <meta http-equiv="refresh" content="0; url={{ $canonicalUrl }}">
+    <script>
+    window.location.href = "{{ $canonicalUrl }}";
+</script>
 </head>
 <body>
     <p>Redirection vers <a href="{{ $canonicalUrl }}">{{ $shop->name }}</a>...</p>
